@@ -14,6 +14,12 @@ const Shop = () => {
   const [cart, setCart] = useState([]);
   const { totalProducts } = useLoaderData();
 
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(totalProducts / itemsPerPage);
+  const pageNumbers = [...Array(totalPages).keys()];
+
+  console.log(totalProducts);
+
   useEffect(() => {
     fetch("http://localhost:5000/products")
       .then((res) => res.json())
@@ -62,24 +68,32 @@ const Shop = () => {
   };
 
   return (
-    <div className="shop-container">
-      <div className="products-container">
-        {products.map((product) => (
-          <Product
-            key={product._id}
-            product={product}
-            handleAddToCart={handleAddToCart}
-          ></Product>
-        ))}
+    <>
+      <div className="shop-container">
+        <div className="products-container">
+          {products.map((product) => (
+            <Product
+              key={product._id}
+              product={product}
+              handleAddToCart={handleAddToCart}
+            ></Product>
+          ))}
+        </div>
+        <div className="cart-container">
+          <Cart cart={cart} handelClearCart={handelClearCart}>
+            <Link to="/orders" className="proceed-link">
+              <button className="btn-proceed">Review Orders</button>
+            </Link>
+          </Cart>
+        </div>
       </div>
-      <div className="cart-container">
-        <Cart cart={cart} handelClearCart={handelClearCart}>
-          <Link to="/orders" className="proceed-link">
-            <button className="btn-proceed">Review Orders</button>
-          </Link>
-        </Cart>
+      {/* pagination */}
+      <div className="pagination">
+        {
+            pageNumbers.map(number => <button key={number}>{number}</button>)
+        }
       </div>
-    </div>
+    </>
   );
 };
 
