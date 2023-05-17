@@ -37,25 +37,36 @@ const Shop = () => {
     fetchData();
   }, [currentPage, itemsPerPage]);
 
-
   useEffect(() => {
     const storedCart = getShoppingCart();
-    const savedCart = [];
-    // get id of the addedProduct
-    for (const id in storedCart) {
-      // get product from products by id
-      const addedProduct = products.find((product) => product._id === id);
-      if (addedProduct) {
-        // add quantity
-        const quantity = storedCart[id];
-        addedProduct.quantity = quantity;
-        // add the added product to the saved cart
-        savedCart.push(addedProduct);
-      }
-    }
-    // set the cart
-    setCart(savedCart);
-  }, [products]);
+    const ids = Object.keys(storedCart);
+
+    fetch("http://localhost:5000/productsById", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(ids),
+    })
+      .then((res) => res.json())
+      .then((cartProducts) => {
+        const savedCart = [];
+        // get id of the addedProduct
+        for (const id in storedCart) {
+          // get product from products by id
+          const addedProduct = cartProducts.find((product) => product._id === id);
+          if (addedProduct) {
+            // add quantity
+            const quantity = storedCart[id];
+            addedProduct.quantity = quantity;
+            // add the added product to the saved cart
+            savedCart.push(addedProduct);
+          }
+        }
+        // set the cart
+        setCart(savedCart);
+      });
+  }, []);
 
   const handleAddToCart = (product) => {
     // const newCart = [...cart, product];
@@ -115,7 +126,7 @@ const Shop = () => {
             onClick={() => setCurrentPage(number)}
             className={currentPage === number ? "selected" : ""}
           >
-            {number}
+            {number + 1}
           </button>
         ))}
 
